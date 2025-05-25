@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, HttpUrl
-from prometheus_client import Counter, Histogram
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from fastapi.responses import Response
 import string
 import random
 import time
@@ -9,10 +11,12 @@ from typing import Dict, Optional
 # Initialize FastAPI app
 app = FastAPI(title="URL Shortener Service", version="1.0.0")
 
+# In-memory storage (use database in production)
 url_database: Dict[str, str] = {}
 
 # Prometheus metrics
 urls_created_counter = Counter('urls_created_total', 'Total number of URLs created')
+redirects_counter = Counter('redirects_total', 'Total number of redirects performed')
 request_duration = Histogram('request_duration_seconds', 'Request duration in seconds', ['method', 'endpoint'])
 
 # Pydantic models
@@ -43,7 +47,9 @@ async def root():
         "message": "URL Shortener Service",
         "version": "1.0.0",
         "endpoints": {
-            "shorten": "POST /shorten - Create a short URL"
+            "shorten": "POST /shorten - Create a short URL",
+            "redirect": "GET /{short_code} - Redirect to original URL",
+            "metrics": "GET /metrics - Prometheus metrics"
         }
     }
 
@@ -66,6 +72,7 @@ async def shorten_url(request: URLRequest, req: Request):
             while code_exists(short_code):
                 short_code = generate_short_code()
         
+        # Store in database
         url_database[short_code] = original_url
         
         # Update metrics
@@ -85,6 +92,50 @@ async def shorten_url(request: URLRequest, req: Request):
         # Record request duration
         duration = time.time() - start_time
         request_duration.labels(method="POST", endpoint="/shorten").observe(duration)
+
+@app.get("/{short_code}")
+async def redirect_url(short_code: str):
+    """Redirect to the original URL using short code"""
+    start_time = time.time()
+    
+    try:
+        if short_code == "metrics":
+            # Handle metrics endpoint to avoid conflict
+            return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+        
+        if short_code not in url_database:
+            raise HTTPException(status_code=404, detail="Short code not found")
+        
+        original_url = url_database[short_code]
+        
+        # Update metrics
+        redirects_counter.inc()
+        
+        return RedirectResponse(url=original_url, status_code=301)
+    
+    finally:
+        # Record request duration
+        duration = time.time() - start_time
+        request_duration.labels(method="GET", endpoint="/{short_code}").observe(duration)
+
+@app.get("/metrics")
+async def get_metrics():
+    """Prometheus metrics endpoint"""
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+@app.get("/stats")
+async def get_stats():
+    """Get basic statistics about the service"""
+    return {
+        "total_urls": len(url_database),
+        "total_redirects": redirects_counter._value._value,
+        "total_urls_created": urls_created_counter._value._value
+    }
+
+# Commented endpoint for live demo (DO NOT UNCOMMENT YET)
+# @app.get("/cicd-test")
+# async def cicd_test():
+#     return {"message": "CI/CD Pipeline Working!", "status": "success"}
 
 if __name__ == "__main__":
     import uvicorn
