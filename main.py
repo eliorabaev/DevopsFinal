@@ -93,6 +93,25 @@ async def shorten_url(request: URLRequest, req: Request):
         duration = time.time() - start_time
         request_duration.labels(method="POST", endpoint="/shorten").observe(duration)
 
+@app.get("/metrics")
+async def get_metrics():
+    """Prometheus metrics endpoint"""
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+@app.get("/stats")
+async def get_stats():
+    """Get basic statistics about the service"""
+    return {
+        "total_urls": len(url_database),
+        "total_redirects": redirects_counter._value._value,
+        "total_urls_created": urls_created_counter._value._value
+    }
+
+# Commented endpoint for live demo (DO NOT UNCOMMENT YET)
+# @app.get("/cicd-test")
+# async def cicd_test():
+#     return {"message": "CI/CD Pipeline Working!", "status": "success"}
+
 @app.get("/{short_code}")
 async def redirect_url(short_code: str):
     """Redirect to the original URL using short code"""
@@ -118,24 +137,6 @@ async def redirect_url(short_code: str):
         duration = time.time() - start_time
         request_duration.labels(method="GET", endpoint="/{short_code}").observe(duration)
 
-@app.get("/metrics")
-async def get_metrics():
-    """Prometheus metrics endpoint"""
-    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
-
-@app.get("/stats")
-async def get_stats():
-    """Get basic statistics about the service"""
-    return {
-        "total_urls": len(url_database),
-        "total_redirects": redirects_counter._value._value,
-        "total_urls_created": urls_created_counter._value._value
-    }
-
-# Commented endpoint for live demo (DO NOT UNCOMMENT YET)
-# @app.get("/cicd-test")
-# async def cicd_test():
-#     return {"message": "CI/CD Pipeline Working!", "status": "success"}
 
 if __name__ == "__main__":
     import uvicorn
