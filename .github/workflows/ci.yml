@@ -23,19 +23,43 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        if [ -f app/requirements.txt ]; then
+          pip install -r app/requirements.txt
+        else
+          pip install -r requirements.txt
+        fi
         pip install flake8 black pytest
     # lint test for code organization
     - name: Lint with flake8
       run: |
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        if [ -d app ]; then
+          flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 app/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        else
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        fi
     # Format test for easy readability
     - name: Format check with black
-      run: black --check .
+      run: |
+        if [ -d app ]; then
+          black --check app/
+        else
+          black --check .
+        fi
     # Run the test_main.py for code functionality
     - name: Run tests
-      run: pytest test_main.py -v
+      run: |
+        if [ -f tests/test_main.py ]; then
+          pytest tests/test_main.py -v
+        else
+          pytest test_main.py -v
+        fi
     # Build the Docker image
     - name: Build Docker image
-      run: docker build -t url-shortener .
+      run: |
+        if [ -f app/Dockerfile ]; then
+          docker build -t url-shortener ./app
+        else
+          docker build -t url-shortener .
+        fi
