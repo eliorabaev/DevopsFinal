@@ -1,0 +1,41 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+# Only 1 job
+  ci:
+  # GitHub virtual "runner" for the job
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Copy the code to runner
+    - name: Checkout code
+      uses: actions/checkout@v4
+    # Python setup
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    # Install my application dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install flake8 black pytest
+    # lint test for code organization
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    # Format test for easy readability
+    - name: Format check with black
+      run: black --check .
+    # Run the test_main.py for code functionality
+    - name: Run tests
+      run: pytest test_main.py -v
+    # Build the Docker image
+    - name: Build Docker image
+      run: docker build -t url-shortener .
