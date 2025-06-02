@@ -23,19 +23,19 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r app/requirements.txt
         pip install flake8 black pytest
     # lint test for code organization
     - name: Lint with flake8
       run: |
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 app/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     # Format test for easy readability
     - name: Format check with black
-      run: black --check .
+      run: black --check app/
     # Run the test_main.py for code functionality
     - name: Run tests
-      run: pytest test_main.py -v
+      run: pytest tests/test_main.py -v
     # Build the Docker image
     - name: Build Docker image
-      run: docker build -t url-shortener .
+      run: docker build -t url-shortener ./app
