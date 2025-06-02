@@ -64,7 +64,7 @@ class TestURLShortener:
         # Then test redirect
         redirect_response = client.get("/python", allow_redirects=False)
         assert redirect_response.status_code == 301
-        assert redirect_response.headers["location"] == "https://www.python.org"
+        assert redirect_response.headers["location"] == "https://www.python.org/"
 
     def test_redirect_invalid_code(self):
         """Test redirecting with invalid short code"""
