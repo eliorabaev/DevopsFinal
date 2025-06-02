@@ -29,8 +29,7 @@ jobs:
           ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:latest
           ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:${{ github.sha }}
 
-    # 4 (deploy step will be added once I have Render hook)
-    # - name: Trigger Render deploy
-    #   if: secrets.RENDER_DEPLOY_HOOK != 'PLACEHOLDER'
-    #   run: |
-    #     curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+    # 4 deploy step 
+    - name: Trigger Render deploy
+      run: curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+
