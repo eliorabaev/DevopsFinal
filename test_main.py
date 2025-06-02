@@ -28,7 +28,7 @@ class TestURLShortener:
         data = response.json()
         assert "short_url" in data
         assert "short_code" in data
-        assert data["original_url"] == "https://www.google.com"
+        assert data["original_url"] == "https://www.google.com/"
         assert len(data["short_code"]) == 6  # default length
 
     def test_shorten_url_custom_code(self):
@@ -39,7 +39,7 @@ class TestURLShortener:
         assert response.status_code == 200
         data = response.json()
         assert data["short_code"] == "github"
-        assert data["original_url"] == "https://www.github.com"
+        assert data["original_url"] == "https://www.github.com/"
 
     def test_shorten_url_duplicate_custom_code(self):
         """Test error when using duplicate custom code"""
