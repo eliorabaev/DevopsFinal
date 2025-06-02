@@ -50,12 +50,7 @@ jobs:
         fi
     # Run the test_main.py for code functionality
     - name: Run tests
-      run: |
-        if [ -f app/tests/test_main.py ]; then
-          pytest app/tests/test_main.py -v
-        else
-          pytest test_main.py -v
-        fi
+      run: pytest app/tests/test_main.py -v
     # Build the Docker image
     - name: Build Docker image
       run: |
