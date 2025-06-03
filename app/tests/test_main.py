@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from main import app, url_database
+from app.main import app, url_database
 
 # Create test client
 client = TestClient(app)
