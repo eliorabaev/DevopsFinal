@@ -1,5 +1,6 @@
 name: CD Pipeline
 
+# Runs only on merged PRs to main and cancels any in-flight runs to avoid concurrency conflicts
 concurrency:
   group: cd-pipeline-main
   cancel-in-progress: true
