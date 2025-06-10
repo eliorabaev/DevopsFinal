@@ -1,0 +1,382 @@
+groups:
+  - name: url_shortener_health
+    interval: 30s
+    rules:
+      - alert: URLShortenerServiceDown
+        expr: up{job="url-shortener"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: url-shortener
+          team: devops-team
+          priority: P1
+        annotations:
+          summary: "🚨 URL Shortener service is DOWN"
+          description: |
+            The URL shortener service has been unavailable for more than 1 minute.
+            Instance: {{ $labels.instance }}
+            Job: {{ $labels.job }}
+            Current status: DOWN
+          runbook_url: "https://wiki.company.com/runbooks/url-shortener-down"
+          dashboard_url: "http://localhost:3000/d/url-shortener"
+
+      - alert: URLShortenerHighErrorRate
+        expr: rate(prometheus_http_requests_total{job="url-shortener",code=~"5.."}[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: url-shortener
+          team: devops-team
+          priority: P2
+        annotations:
+          summary: "⚠️ High error rate in URL Shortener"
+          description: |
+            URL shortener is experiencing high 5xx error rate.
+            Current rate: {{ $value | humanize }} errors/sec
+            Threshold: 0.1 errors/sec
+          runbook_url: "https://wiki.company.com/runbooks/high-error-rate"
+
+      - alert: URLShortenerSlowResponse
+        expr: histogram_quantile(0.95, rate(request_duration_seconds_bucket{job="url-shortener"}[5m])) > 1
+        for: 3m
+        labels:
+          severity: warning
+          service: url-shortener
+          team: devops-team
+          priority: P2
+        annotations:
+          summary: "🐌 URL Shortener slow response times"
+          description: |
+            95th percentile response time is above 1 second.
+            Current P95: {{ $value | humanize }}s
+            Threshold: 1s
+            This may impact user experience.
+
+  - name: url_shortener_business
+    interval: 60s
+    rules:
+      - alert: HighURLCreationRate
+        expr: rate(urls_created_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: info
+          service: url-shortener
+          team: devops-team
+          priority: P3
+        annotations:
+          summary: "📈 High URL creation rate detected"
+          description: |
+            URL creation rate is unusually high.
+            Current rate: {{ $value | humanize }} URLs/sec
+            This might indicate viral content or potential abuse.
+
+      - alert: NoURLsCreatedRecently
+        expr: increase(urls_created_total[1h]) == 0
+        for: 30m
+        labels:
+          severity: warning
+          service: url-shortener
+          team: devops-team
+          priority: P2
+        annotations:
+          summary: "😴 No URLs created in the last hour"
+          description: |
+            No new URLs have been created in the past hour.
+            This might indicate a service issue or lack of traffic.
+
+      - alert: HighRedirectRate
+        expr: rate(redirects_total[5m]) > 50
+        for: 5m
+        labels:
+          severity: info
+          service: url-shortener
+          team: devops-team
+          priority: P3
+        annotations:
+          summary: "🚀 High redirect rate detected"
+          description: |
+            Redirect rate is unusually high.
+            Current rate: {{ $value | humanize }} redirects/sec
+            This indicates high traffic usage.
+
+      - alert: LowRedirectToCreationRatio
+        expr: (rate(redirects_total[1h]) / rate(urls_created_total[1h])) < 0.1
+        for: 30m
+        labels:
+          severity: warning
+          service: url-shortener
+          team: devops-team
+          priority: P2
+        annotations:
+          summary: "📉 Low redirect-to-creation ratio"
+          description: |
+            Ratio of redirects to URL creation is very low.
+            Current ratio: {{ $value | humanizePercentage }}
+            This might indicate created URLs are not being used.
+
+  - name: system_resources
+    interval: 30s
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+          team: devops-team
+          priority: P2
+        annotations:
+          summary: "🔥 High CPU usage detected"
+          description: |
+            CPU usage is above 80% for more than 5 minutes.
+            Current usage: {{ $value | humanize }}%
+            Instance: {{ $labels.instance }}
+            Consider scaling up or investigating high load.
+
+      - alert: CriticalCPUUsage
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: system
+          team: devops-team
+          priority: P1
+        annotations:
+          summary: "🚨 CRITICAL CPU usage"
+          description: |
+            CPU usage is above 95% for more than 2 minutes.
+            Current usage: {{ $value | humanize }}%
+            Instance: {{ $labels.instance }}
+            IMMEDIATE ACTION REQUIRED!
+
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+          team: devops-team
+          priority: P2
+        annotations:
+          summary: "🧠 High memory usage detected"
+          description: |
+            Memory usage is above 85% for more than 5 minutes.
+            Current usage: {{ $value | humanize }}%
+            Available: {{ with query "node_memory_MemAvailable_bytes" }}{{ . | first | value | humanize1024 }}B{{ end }}
+            Total: {{ with query "node_memory_MemTotal_bytes" }}{{ . | first | value | humanize1024 }}B{{ end }}
+
+      - alert: CriticalMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: system
+          team: devops-team
+          priority: P1
+        annotations:
+          summary: "🚨 CRITICAL memory usage"
+          description: |
+            Memory usage is above 95% for more than 2 minutes.
+            Current usage: {{ $value | humanize }}%
+            Instance: {{ $labels.instance }}
+            System may become unresponsive!
+
+      - alert: HighDiskUsage
+        expr: 100 - ((node_filesystem_avail_bytes{mountpoint="/",fstype!="rootfs"} * 100) / node_filesystem_size_bytes{mountpoint="/",fstype!="rootfs"}) > 85
+        for: 10m
+        labels:
+          severity: warning
+          service: system
+          team: devops-team
+          priority: P2
+        annotations:
+          summary: "💾 High disk usage detected"
+          description: |
+            Disk usage is above 85% for more than 10 minutes.
+            Current usage: {{ $value | humanize }}%
+            Available: {{ with query "node_filesystem_avail_bytes{mountpoint=\"/\"}" }}{{ . | first | value | humanize1024 }}B{{ end }}
+            Consider cleaning up or expanding storage.
+
+      - alert: CriticalDiskUsage
+        expr: 100 - ((node_filesystem_avail_bytes{mountpoint="/",fstype!="rootfs"} * 100) / node_filesystem_size_bytes{mountpoint="/",fstype!="rootfs"}) > 95
+        for: 5m
+        labels:
+          severity: critical
+          service: system
+          team: devops-team
+          priority: P1
+        annotations:
+          summary: "🚨 CRITICAL disk usage"
+          description: |
+            Disk usage is above 95% for more than 5 minutes.
+            Current usage: {{ $value | humanize }}%
+            Instance: {{ $labels.instance }}
+            System may stop functioning!
+
+  - name: monitoring_infrastructure
+    interval: 60s
+    rules:
+      - alert: PrometheusDown
+        expr: up{job="prometheus"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: monitoring
+          team: devops-team
+          priority: P1
+        annotations:
+          summary: "🚨 Prometheus server is DOWN"
+          description: |
+            Prometheus monitoring server is not responding.
+            All monitoring capabilities are compromised!
+
+      - alert: GrafanaDown
+        expr: up{job="grafana"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          service: monitoring
+          team: devops-team
+          priority: P2
+        annotations:
+          summary: "📊 Grafana dashboard server is DOWN"
+          description: |
+            Grafana visualization server is not responding.
+            Dashboards are not accessible.
+
+      - alert: NodeExporterDown
+        expr: up{job="node-exporter"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          service: monitoring
+          team: devops-team
+          priority: P2
+        annotations:
+          summary: "📈 Node Exporter is DOWN"
+          description: |
+            Node Exporter for system metrics is not responding.
+            System monitoring is compromised.
+
+      - alert: PrometheusConfigReloadFailed
+        expr: prometheus_config_last_reload_successful == 0
+        for: 5m
+        labels:
+          severity: warning
+          service: monitoring
+          team: devops-team
+          priority: P2
+        annotations:
+          summary: "⚙️ Prometheus configuration reload failed"
+          description: |
+            Prometheus failed to reload its configuration.
+            New rules and targets may not be active.
+
+      - alert: PrometheusTSDBCompactionsFailed
+        expr: increase(prometheus_tsdb_compactions_failed_total[1h]) > 0
+        for: 0m
+        labels:
+          severity: warning
+          service: monitoring
+          team: devops-team
+          priority: P2
+        annotations:
+          summary: "💾 Prometheus TSDB compaction failed"
+          description: |
+            Prometheus has failed to compact time series data.
+            This may lead to increased storage usage and slower queries.
+
+  - name: network_connectivity
+    interval: 30s
+    rules:
+      - alert: HighNetworkTraffic
+        expr: rate(node_network_receive_bytes_total[5m]) > 100 * 1024 * 1024  # 100 MB/s
+        for: 10m
+        labels:
+          severity: info
+          service: network
+          team: devops-team
+          priority: P3
+        annotations:
+          summary: "🌐 High network traffic detected"
+          description: |
+            High network receive traffic detected.
+            Current rate: {{ $value | humanize1024 }}B/s
+            Interface: {{ $labels.device }}
+
+      - alert: NetworkInterfaceDown
+        expr: node_network_up == 0
+        for: 1m
+        labels:
+          severity: warning
+          service: network
+          team: devops-team
+          priority: P2
+        annotations:
+          summary: "📡 Network interface is DOWN"
+          description: |
+            Network interface {{ $labels.device }} is down.
+            This may affect connectivity.
+
+  - name: security_anomalies
+    interval: 120s
+    rules:
+      - alert: UnusuallyHighTraffic
+        expr: rate(prometheus_http_requests_total{job="url-shortener"}[10m]) > 100
+        for: 5m
+        labels:
+          severity: info
+          service: security
+          team: devops-team
+          priority: P3
+        annotations:
+          summary: "🔍 Unusually high traffic pattern detected"
+          description: |
+            Request rate is significantly higher than normal.
+            Current rate: {{ $value | humanize }} requests/sec
+            This might indicate a DDoS attack or viral content.
+
+      - alert: ServiceRestarted
+        expr: time() - node_boot_time_seconds < 300
+        for: 0m
+        labels:
+          severity: info
+          service: system
+          team: devops-team
+          priority: P3
+        annotations:
+          summary: "🔄 System was recently restarted"
+          description: |
+            The system was restarted less than 5 minutes ago.
+            Boot time: {{ $value | humanizeTimestamp }}
+
+  - name: business_logic
+    interval: 300s 
+    rules:
+      - alert: DatabaseConnectionIssue
+        expr: absent(urls_created_total) or absent(redirects_total)
+        for: 2m
+        labels:
+          severity: critical
+          service: url-shortener
+          team: devops-team
+          priority: P1
+        annotations:
+          summary: "🗄️ Database metrics missing - possible connection issue"
+          description: |
+            Core application metrics are missing.
+            This usually indicates database connectivity problems.
+
+      - alert: HealthCheckFailing
+        expr: probe_success{job="url-shortener"} == 0
+        for: 3m
+        labels:
+          severity: critical
+          service: url-shortener
+          team: devops-team
+          priority: P1
+        annotations:
+          summary: "❤️ Health check is failing"
+          description: |
+            Application health check is consistently failing.
+            The service may be experiencing internal issues.
