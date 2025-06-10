@@ -1,35 +1,36 @@
-name: CD Pipeline               
+name: CD Pipeline
+
+concurrency:
+  group: cd-pipeline-main
+  cancel-in-progress: true
 
 on:
-  push:
-    branches: [ main ]    
-  workflow_dispatch: 
+  pull_request:
+    types: [ closed ]
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   cd:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
     steps:
-    # 1 check out code
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    # 2 log in to Docker Hub using the two repo secrets
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    # 3 build the image defined by your Dockerfile and push
-    - name: Build & push image
-      uses: docker/build-push-action@v5
-      with:
-        push: true
-        tags: |
-          ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:latest
-          ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:${{ github.sha }}
+      - name: Build & push image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:${{ github.sha }}
 
-    # 4 deploy step 
-    - name: Trigger Render deploy
-      run: curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
-
+      - name: Trigger Render deploy
+        run: curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
