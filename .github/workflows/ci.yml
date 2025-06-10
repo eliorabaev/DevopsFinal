@@ -5,37 +5,62 @@ on:
     branches: [ main ]
 
 jobs:
-# Only 1 job
   ci:
-  # GitHub virtual "runner" for the job
     runs-on: ubuntu-latest
     
     steps:
-    # Copy the code to runner
+
     - name: Checkout code
       uses: actions/checkout@v4
-    # Python setup
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    # Install my application dependencies
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        if [ -f app/requirements.txt ]; then
+          pip install -r app/requirements.txt
+        else
+          pip install -r requirements.txt
+        fi
         pip install flake8 black pytest
-    # lint test for code organization
+
     - name: Lint with flake8
       run: |
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    # Format test for easy readability
+        if [ -d app ]; then
+          flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 app/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        else
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        fi
+
     - name: Format check with black
-      run: black --check .
-    # Run the test_main.py for code functionality
+      run: |
+        if [ -d app ]; then
+          black --check app/
+        else
+          black --check .
+        fi
+
     - name: Run tests
-      run: pytest test_main.py -v
-    # Build the Docker image
+      run: |
+
+        export PYTHONPATH=$PYTHONPATH:.
+
+        if [ -f app/tests/test_main.py ]; then
+          pytest app/tests/ -v
+        else
+          pytest test_main.py -v
+        fi
+
     - name: Build Docker image
-      run: docker build -t url-shortener .
+      run: |
+        if [ -f app/Dockerfile ]; then
+          docker build -t url-shortener ./app
+        else
+          docker build -t url-shortener .
+        fi
