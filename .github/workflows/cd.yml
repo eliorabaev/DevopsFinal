@@ -33,3 +33,6 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:${{ github.sha }}
+
+      - name: Trigger Render deploy
+        run: curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
