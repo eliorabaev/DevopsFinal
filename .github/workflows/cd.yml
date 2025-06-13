@@ -1,6 +1,5 @@
 name: CD Pipeline
 
-# Runs only on merged PRs to main and cancels any in-flight runs to avoid concurrency conflicts
 concurrency:
   group: cd-pipeline-main
   cancel-in-progress: true
@@ -28,10 +27,9 @@ jobs:
       - name: Build & push image
         uses: docker/build-push-action@v5
         with:
+          context: ./app
+          file: ./app/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:${{ github.sha }}
-
-      - name: Trigger Render deploy
-        run: curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
