@@ -305,7 +305,7 @@ groups:
             Interface: {{ $labels.device }}
 
       - alert: NetworkInterfaceDown
-        expr: node_network_up == 0
+        expr: node_network_up{device!~"lo|veth.*|docker.*|br-.*"} == 0
         for: 1m
         labels:
           severity: warning
