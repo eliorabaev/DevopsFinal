@@ -250,7 +250,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "count(ALERTS{alertstate=\"firing\", alertname=~\".*CPU.*|.*Memory.*|.*Disk.*\"}) OR on() vector(0)",
+          "expr": "count(ALERTS{alertstate=\"firing\", alertname=~\".CPU.|.Memory.|.Disk.\"}) OR on() vector(0)",
           "legendFormat": "Resource Alerts",
           "refId": "A"
         }
@@ -330,7 +330,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "count(ALERTS{alertstate=\"firing\", alertname=~\"Prometheus.*|Grafana.*|NodeExporter.*\"}) OR on() vector(0)",
+          "expr": "count(ALERTS{alertstate=\"firing\", alertname=~\"Prometheus.|Grafana.|NodeExporter.*\"}) OR on() vector(0)",
           "legendFormat": "Monitoring Alerts",
           "refId": "A"
         }
@@ -410,7 +410,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "count(ALERTS{alertstate=\"firing\", alertname=~\".*URL.*|.*Traffic.*|.*Database.*|.*Health.*\"}) OR on() vector(0)",
+          "expr": "count(ALERTS{alertstate=\"firing\", alertname=~\".URL.|.Traffic.|.Database.|.Health.\"}) OR on() vector(0)",
           "legendFormat": "Business & Security Alerts",
           "refId": "A"
         }
@@ -522,7 +522,7 @@
           "options": {
             "excludeByName": {
               "Time": true,
-              "__name__": true,
+              "_name_": true,
               "job": true,
               "instance": true
             },
