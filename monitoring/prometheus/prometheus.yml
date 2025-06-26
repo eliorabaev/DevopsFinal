@@ -4,7 +4,7 @@ global:
   scrape_timeout: 10s
   external_labels:
     cluster: 'url-shortener-cluster'
-    environment: 'development'
+    environment: 'production'
     project: 'devops-final'
 
 rule_files:
@@ -29,18 +29,23 @@ scrape_configs:
 
   - job_name: 'url-shortener'
     static_configs:
-      - targets: ['url-shortener:8000']
-    scrape_interval: 5s
-    scrape_timeout: 5s
+      - targets: ['url-shortener-latest-gccb.onrender.com:443']
+    scheme: https
+    scrape_interval: 30s
+    scrape_timeout: 15s
     metrics_path: '/metrics'
     params:
       format: ['prometheus']
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
-        replacement: 'url-shortener-app'
+        replacement: 'url-shortener-render-prod'
       - target_label: service
         replacement: 'url-shortener'
+      - target_label: environment
+        replacement: 'production'
+      - target_label: deployment_type
+        replacement: 'render'
       - target_label: team
         replacement: 'devops-team'
 
