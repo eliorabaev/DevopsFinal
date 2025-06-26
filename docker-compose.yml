@@ -1,6 +1,4 @@
 services:
-  # REMOVED: url-shortener service (now runs on Render)
-  # This eliminates port conflicts and resource waste
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -11,7 +9,8 @@ services:
       - monitoring
     command:
       - '--path.rootfs=/host'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc|rootfs/run/user)($$|/)'
+      - '--collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$$'
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -39,7 +38,6 @@ services:
     restart: unless-stopped
     depends_on:
       - node-exporter
-    # REMOVED: url-shortener dependency
 
   grafana:
     image: grafana/grafana:latest

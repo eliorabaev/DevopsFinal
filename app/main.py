@@ -8,13 +8,10 @@ import random
 import time
 from typing import Dict, Optional
 
-# Initialize FastAPI app
 app = FastAPI(title="URL Shortener Service", version="1.0.0")
 
-# In-memory storage (use database in production)
 url_database: Dict[str, str] = {}
 
-# Prometheus metrics
 urls_created_counter = Counter("urls_created_total", "Total number of URLs created")
 redirects_counter = Counter("redirects_total", "Total number of redirects performed")
 request_duration = Histogram(
@@ -22,7 +19,6 @@ request_duration = Histogram(
 )
 
 
-# Pydantic models
 class URLRequest(BaseModel):
     url: HttpUrl
     custom_code: Optional[str] = None
@@ -34,14 +30,12 @@ class URLResponse(BaseModel):
     short_code: str
 
 
-# Helper function to generate random short code
 def generate_short_code(length: int = 6) -> str:
     """Generate a random short code using letters and digits"""
     characters = string.ascii_letters + string.digits
     return "".join(random.choice(characters) for _ in range(length))
 
 
-# Helper function to check if code exists
 def code_exists(code: str) -> bool:
     """Check if a short code already exists in database"""
     return code in url_database
@@ -69,7 +63,6 @@ async def shorten_url(request: URLRequest, req: Request):
     try:
         original_url = str(request.url)
 
-        # Use custom code if provided, otherwise generate random one
         if request.custom_code:
             if code_exists(request.custom_code):
                 raise HTTPException(
@@ -77,18 +70,14 @@ async def shorten_url(request: URLRequest, req: Request):
                 )
             short_code = request.custom_code
         else:
-            # Generate unique short code
             short_code = generate_short_code()
             while code_exists(short_code):
                 short_code = generate_short_code()
 
-        # Store in database
         url_database[short_code] = original_url
 
-        # Update metrics
         urls_created_counter.inc()
 
-        # Create response
         base_url = str(req.base_url).rstrip("/")
         short_url = f"{base_url}/{short_code}"
 
@@ -97,7 +86,6 @@ async def shorten_url(request: URLRequest, req: Request):
         )
 
     finally:
-        # Record request duration
         duration = time.time() - start_time
         request_duration.labels(method="POST", endpoint="/shorten").observe(duration)
 
@@ -131,7 +119,6 @@ async def redirect_url(short_code: str):
 
     try:
         if short_code == "metrics":
-            # Handle metrics endpoint to avoid conflict
             return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
         if short_code not in url_database:
@@ -139,13 +126,11 @@ async def redirect_url(short_code: str):
 
         original_url = url_database[short_code]
 
-        # Update metrics
         redirects_counter.inc()
 
         return RedirectResponse(url=original_url, status_code=301)
 
     finally:
-        # Record request duration
         duration = time.time() - start_time
         request_duration.labels(method="GET", endpoint="/{short_code}").observe(
             duration
