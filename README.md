@@ -45,7 +45,7 @@ This project demonstrates a **hybrid cloud architecture** where a URL shortener 
 
 ```
 ┌─────────────────┐    ┌──────────────┐    ┌─────────────┐
-│   Prometheus    │───▶│ URL Shortener│───▶│   Grafana   │
+│   Prometheus    │───▶ URL Shortener ───▶   Grafana    │
 │  (localhost)    │    │   (Render)   │    │ (localhost) │
 └─────────────────┘    └──────────────┘    └─────────────┘
 ```

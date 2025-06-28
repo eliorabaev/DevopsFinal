@@ -36,7 +36,7 @@ groups:
             This may impact user experience.
 
       - alert: URLShortenerLowActivity
-        expr: increase(urls_created_total[10m]) == 0
+        expr: rate(urls_created_total[10m]) == 0 AND increase(urls_created_total[30m]) > 0
         for: 10m
         labels:
           severity: warning
@@ -46,12 +46,27 @@ groups:
         annotations:
           summary: "No URL creation activity detected"
           description: |
-            URL shortener hasn't created any URLs for 10+ minutes.
+            URL shortener hasn't created any URLs for 10+ minutes but was active recently.
             This may indicate application errors or service issues.
             Check application logs and Render dashboard.
 
+      - alert: URLShortenerFrequentRestarts
+        expr: increase(resets(urls_created_total[1h])[10m:1m]) > 3
+        for: 5m
+        labels:
+          severity: warning
+          service: url-shortener
+          team: devops-team
+          priority: P2
+        annotations:
+          summary: "Service experiencing frequent restarts"
+          description: |
+            URL shortener has restarted more than 3 times in the last hour.
+            Current restarts: {{ $value }}
+            This indicates service instability on Render.
+
       - alert: RenderServiceColdStart
-        expr: increase(urls_created_total[2m]) == 0 AND increase(urls_created_total[30m]) > 0
+        expr: rate(urls_created_total[2m]) == 0 AND increase(urls_created_total[30m]) > 0
         for: 0m
         labels:
           severity: info
@@ -69,7 +84,7 @@ groups:
     interval: 60s
     rules:
       - alert: HighURLCreationRate
-        expr: rate(urls_created_total[5m]) > 10
+        expr: rate(urls_created_total[5m]) > 0.5
         for: 5m
         labels:
           severity: info
@@ -84,7 +99,7 @@ groups:
             This might indicate viral content or potential abuse.
 
       - alert: NoURLsCreatedRecently
-        expr: increase(urls_created_total[1h]) == 0
+        expr: increase(urls_created_total[1h]) == 0 AND increase(urls_created_total[24h]) > 0
         for: 45m 
         labels:
           severity: warning
@@ -94,12 +109,12 @@ groups:
         annotations:
           summary: "No URLs created in the last hour (Production)"
           description: |
-            No new URLs have been created in the past hour on Render.
+            No new URLs have been created in the past hour on Render but service was active in last 24h.
             This might indicate a service issue or Render sleep cycle.
             Check if service needs to be woken up.
 
       - alert: HighRedirectRate
-        expr: rate(redirects_total[5m]) > 50
+        expr: rate(redirects_total[5m]) > 10
         for: 5m
         labels:
           severity: info
@@ -114,7 +129,7 @@ groups:
             This indicates high traffic usage.
 
       - alert: LowRedirectToCreationRatio
-        expr: rate(redirects_total[10m]) / rate(urls_created_total[10m]) < 0.1
+        expr: (rate(redirects_total[10m]) / rate(urls_created_total[10m])) < 0.1 AND rate(urls_created_total[10m]) > 0
         for: 15m
         labels:
           severity: info
@@ -225,7 +240,7 @@ groups:
     interval: 120s
     rules:
       - alert: RenderServiceInactivityWarning
-        expr: increase(urls_created_total[25m]) == 0 AND increase(redirects_total[25m]) == 0
+        expr: increase(urls_created_total[25m]) == 0 AND increase(redirects_total[25m]) == 0 AND increase(urls_created_total[24h]) > 0
         for: 5m
         labels:
           severity: info
@@ -235,6 +250,6 @@ groups:
         annotations:
           summary: "Render service approaching sleep threshold"
           description: |
-            No activity detected for 25+ minutes on Render service.
+            No activity detected for 25+ minutes on Render service but was active in last 24h.
             Render free tier sleeps after 30 minutes of inactivity.
             Service will enter sleep mode soon.

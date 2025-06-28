@@ -599,7 +599,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "urls_created_total",
+          "expr": "increase(urls_created_total[$__range]) OR on() vector(0)",
           "refId": "A"
         }
       ],
@@ -666,7 +666,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "redirects_total",
+          "expr": "increase(redirects_total[$__range]) OR on() vector(0)",
           "refId": "A"
         }
       ],
@@ -1023,7 +1023,7 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Rate of URL creation per minute",
+      "description": "Rate of URL creation per minute (already correctly using rate function)",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1112,7 +1112,7 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Rate of redirects per minute",
+      "description": "Rate of redirects per minute (already correctly using rate function)",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1402,6 +1402,108 @@
       ],
       "title": "System Resources Over Time",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "description": "Counter reset detection - shows when service restarts occur",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "points",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 8,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 50
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "resets(urls_created_total[1h])",
+          "legendFormat": "URL Counter Resets (Service Restarts)",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "resets(redirects_total[1h])",
+          "legendFormat": "Redirect Counter Resets (Service Restarts)",
+          "refId": "B"
+        }
+      ],
+      "title": "Service Restart Detection (Counter Resets) - NEW",
+      "type": "timeseries"
     }
   ],
   "refresh": "5s",
@@ -1411,7 +1513,8 @@
     "url-shortener",
     "monitoring",
     "devops",
-    "alerts"
+    "alerts",
+    "counter-fixes"
   ],
   "templating": {
     "list": []
@@ -1422,8 +1525,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "URL Shortener - Comprehensive Monitoring Dashboard",
-  "uid": "url-shortener-dashboard",
-  "version": 2,
+  "title": "URL Shortener - Fixed Counter Metrics Dashboard",
+  "uid": "url-shortener-dashboard-fixed",
+  "version": 3,
   "weekStart": ""
 }
