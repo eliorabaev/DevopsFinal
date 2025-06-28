@@ -105,8 +105,8 @@ async def get_stats():
 
     return {
         "total_urls": len(url_database),
-        "total_redirects_since_restart": current_redirects,
-        "total_urls_created_since_restart": current_urls_created,
+        "total_redirects": current_redirects,
+        "total_urls": current_urls_created,
         "info": "Counter values reset on service restart - this is normal Prometheus behavior. Use increase() function in Grafana for historical totals.",
     }
 
