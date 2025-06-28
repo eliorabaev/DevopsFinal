@@ -100,9 +100,9 @@ async def get_metrics():
 async def get_stats():
     """Get basic statistics about the service"""
 
-    current_urls_created = urls_created_counter._value._value
-    current_redirects = redirects_counter._value._value
-    
+    current_urls_created = urls_created_counter._value.get()
+    current_redirects = redirects_counter._value.get()
+
     return {
         "total_urls": len(url_database),
         "total_redirects_since_restart": current_redirects,
