@@ -1525,8 +1525,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "URL Shortener - Fixed Counter Metrics Dashboard",
-  "uid": "url-shortener-dashboard-fixed",
+  "title": "URL Shortener - Comprehensive Monitoring Dashboard",
+  "uid": "url-shortener-dashboard",
   "version": 3,
   "weekStart": ""
 }
