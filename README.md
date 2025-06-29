@@ -68,8 +68,8 @@ This project demonstrates a **hybrid cloud architecture** where a URL shortener 
 
 ### 1. Clone and Setup
 ```bash
-git clone https://github.com/your-username/url-shortener-monitoring.git
-cd url-shortener-monitoring
+git clone https://github.com/eliorabaev/DevopsFinal.git
+cd DevopsFinal
 ```
 
 ### 2. Start Monitoring Stack
@@ -304,7 +304,5 @@ curl "http://localhost:3000/api/health"
 - **Saar Salhov** ([@saarsalhov](https://github.com/saarsalhov)) the best DevOps mentor. Thank you for everything!
 
 ---
-
-**Questions or Issues?** [Open an issue](https://github.com/your-username/url-shortener-monitoring/issues) or reach out to the maintainers.
 
 **Live Demo:** Try the service at [https://url-shortener-latest-gccb.onrender.com](https://url-shortener-latest-gccb.onrender.com)
