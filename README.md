@@ -305,6 +305,4 @@ curl "http://localhost:3000/api/health"
 
 ---
 
-**Questions or Issues?** [Open an issue](https://github.com/your-username/url-shortener-monitoring/issues) or reach out to the maintainers.
-
 **Live Demo:** Try the service at [https://url-shortener-latest-gccb.onrender.com](https://url-shortener-latest-gccb.onrender.com)
