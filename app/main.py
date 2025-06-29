@@ -107,9 +107,9 @@ async def get_stats():
 
 
 # Commented endpoint for live demo (DO NOT UNCOMMENT YET)
-# @app.get("/cicd-test")
-# async def cicd_test():
-#     return {"message": "CI/CD Pipeline Working!", "status": "success"}
+@app.get("/cicd-test")
+async def cicd_test():
+    return {"message": "CI/CD Pipeline Working!", "status": "success"}
 
 
 @app.get("/{short_code}")
