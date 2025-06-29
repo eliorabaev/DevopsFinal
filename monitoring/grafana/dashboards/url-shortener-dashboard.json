@@ -27,7 +27,7 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Overall system alert status - Green = All OK, Red = Alerts Active",
+      "description": "Service availability and health status",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -37,9 +37,14 @@
             {
               "options": {
                 "0": {
-                  "color": "green",
+                  "color": "red",
                   "index": 0,
-                  "text": "All Systems Operational"
+                  "text": "Service DOWN"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "Service UP"
                 }
               },
               "type": "value"
@@ -49,11 +54,11 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
+                "color": "red",
                 "value": null
               },
               {
-                "color": "red",
+                "color": "green",
                 "value": 1
               }
             ]
@@ -63,8 +68,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
-        "w": 24,
+        "h": 6,
+        "w": 8,
         "x": 0,
         "y": 0
       },
@@ -90,12 +95,12 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "count(ALERTS{alertstate=\"firing\"}) OR on() vector(0)",
-          "legendFormat": "Active Alerts",
+          "expr": "up{job=\"url-shortener\"}",
+          "legendFormat": "Service Status",
           "refId": "A"
         }
       ],
-      "title": "Overall System Status",
+      "title": "🚀 Service Status",
       "type": "stat"
     },
     {
@@ -103,57 +108,32 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Service Health Alerts Status",
+      "description": "Total URLs created since service start",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
           },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "green",
-                  "index": 0,
-                  "text": "Service Healthy"
-                }
-              },
-              "type": "value"
+          "custom": {
+            "hideFrom": {
+              "tooltip": false,
+              "vis": false,
+              "legend": false
             }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 1
-              },
-              {
-                "color": "red",
-                "value": 2
-              }
-            ]
           },
+          "mappings": [],
           "unit": "short"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 6,
-        "w": 6,
-        "x": 0,
-        "y": 4
+        "w": 8,
+        "x": 8,
+        "y": 0
       },
       "id": 2,
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "auto",
         "reduceOptions": {
           "values": false,
           "calcs": [
@@ -161,7 +141,21 @@
           ],
           "fields": ""
         },
-        "textMode": "auto"
+        "pieType": "pie",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "visible",
+          "placement": "bottom",
+          "showLegend": true,
+          "values": []
+        },
+        "displayLabels": [
+          "name",
+          "value"
+        ]
       },
       "pluginVersion": "10.2.0",
       "targets": [
@@ -170,37 +164,35 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "count(ALERTS{alertstate=\"firing\", alertname=~\"URLShortener.*\"}) OR on() vector(0)",
-          "legendFormat": "Service Health Alerts",
+          "expr": "urls_created_total",
+          "legendFormat": "URLs Created",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "redirects_total",
+          "legendFormat": "Redirects Performed",
+          "refId": "B"
         }
       ],
-      "title": "Service Health",
-      "type": "stat"
+      "title": "📊 Service Usage Overview",
+      "type": "piechart"
     },
     {
       "datasource": {
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "System Resource Alerts Status",
+      "description": "Current response time performance",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "green",
-                  "index": 0,
-                  "text": "Resources OK"
-                }
-              },
-              "type": "value"
-            }
-          ],
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -214,25 +206,22 @@
               },
               {
                 "color": "red",
-                "value": 3
+                "value": 2
               }
             ]
           },
-          "unit": "short"
+          "unit": "s"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 6,
-        "w": 6,
-        "x": 6,
-        "y": 4
+        "w": 8,
+        "x": 16,
+        "y": 0
       },
       "id": 3,
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
         "orientation": "auto",
         "reduceOptions": {
           "values": false,
@@ -241,7 +230,9 @@
           ],
           "fields": ""
         },
-        "textMode": "auto"
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
       },
       "pluginVersion": "10.2.0",
       "targets": [
@@ -250,147 +241,624 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "count(ALERTS{alertstate=\"firing\", alertname=~\".CPU.|.Memory.|.Disk.\"}) OR on() vector(0)",
-          "legendFormat": "Resource Alerts",
+          "expr": "histogram_quantile(0.95, rate(request_duration_seconds_bucket{job=\"url-shortener\"}[5m]))",
+          "legendFormat": "95th Percentile",
           "refId": "A"
         }
       ],
-      "title": "System Resources",
-      "type": "stat"
+      "title": "⚡ Response Time (P95)",
+      "type": "gauge"
     },
     {
       "datasource": {
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Monitoring Infrastructure Alerts",
+      "description": "Real-time activity: URL creation and redirect rates",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
           },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "green",
-                  "index": 0,
-                  "text": "Monitoring OK"
-                }
-              },
-              "type": "value"
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
             }
-          ],
+          },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 1
-              },
-              {
-                "color": "red",
-                "value": 2
               }
             ]
           },
-          "unit": "short"
+          "unit": "reqps"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "URLs Created/min"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Redirects/min"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 12,
-        "y": 4
+        "h": 8,
+        "w": 16,
+        "x": 0,
+        "y": 6
       },
       "id": 4,
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
+        "legend": {
           "calcs": [
-            "lastNotNull"
+            "lastNotNull",
+            "max"
           ],
-          "fields": ""
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
         },
-        "textMode": "auto"
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
-      "pluginVersion": "10.2.0",
       "targets": [
         {
           "datasource": {
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "count(ALERTS{alertstate=\"firing\", alertname=~\"Prometheus.|Grafana.|NodeExporter.*\"}) OR on() vector(0)",
-          "legendFormat": "Monitoring Alerts",
+          "expr": "rate(urls_created_total[1m]) * 60",
+          "legendFormat": "URLs Created/min",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(redirects_total[1m]) * 60",
+          "legendFormat": "Redirects/min",
+          "refId": "B"
         }
       ],
-      "title": "Monitoring Stack",
-      "type": "stat"
+      "title": "📈 Real-Time Activity",
+      "type": "timeseries"
     },
     {
       "datasource": {
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Business Logic & Security Alerts",
+      "description": "Key performance metrics at a glance",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "green",
-                  "index": 0,
-                  "text": "Business OK"
-                }
-              },
-              "type": "value"
-            }
-          ],
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total URLs"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
               },
               {
-                "color": "yellow",
-                "value": 1
-              },
-              {
-                "color": "red",
-                "value": 2
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
               }
             ]
           },
-          "unit": "short"
-        },
-        "overrides": []
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Total Redirects"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Avg Response Time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.5
+                    },
+                    {
+                      "color": "red",
+                      "value": 1
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Usage Ratio"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.1
+                    },
+                    {
+                      "color": "green",
+                      "value": 0.5
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 6,
-        "w": 6,
-        "x": 18,
-        "y": 4
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 6
       },
       "id": 5,
       "options": {
         "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "urls_created_total",
+          "legendFormat": "Total URLs",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "redirects_total",
+          "legendFormat": "Total Redirects",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "histogram_quantile(0.50, rate(request_duration_seconds_bucket{job=\"url-shortener\"}[5m]))",
+          "legendFormat": "Avg Response Time",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "redirects_total / (urls_created_total + 1)",
+          "legendFormat": "Usage Ratio",
+          "refId": "D"
+        }
+      ],
+      "title": "📋 Key Metrics Summary",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "description": "Response time percentiles over time",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "histogram_quantile(0.95, rate(request_duration_seconds_bucket{job=\"url-shortener\"}[5m]))",
+          "legendFormat": "95th percentile",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "histogram_quantile(0.75, rate(request_duration_seconds_bucket{job=\"url-shortener\"}[5m]))",
+          "legendFormat": "75th percentile",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "histogram_quantile(0.50, rate(request_duration_seconds_bucket{job=\"url-shortener\"}[5m]))",
+          "legendFormat": "50th percentile (median)",
+          "refId": "C"
+        }
+      ],
+      "title": "⚡ Response Time Distribution",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "description": "System resource utilization on monitoring host",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 15,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 14
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+          "legendFormat": "CPU Usage %",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+          "legendFormat": "Memory Usage %",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "100 - ((node_filesystem_avail_bytes{mountpoint=\"/\",fstype!=\"rootfs\"} * 100) / node_filesystem_size_bytes{mountpoint=\"/\",fstype!=\"rootfs\"})",
+          "legendFormat": "Disk Usage %",
+          "refId": "C"
+        }
+      ],
+      "title": "💻 System Resources",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "description": "Monitoring infrastructure health",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "DOWN"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "UP"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 22
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "background",
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
@@ -410,12 +878,30 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "count(ALERTS{alertstate=\"firing\", alertname=~\".URL.|.Traffic.|.Database.|.Health.\"}) OR on() vector(0)",
-          "legendFormat": "Business & Security Alerts",
+          "expr": "up{job=\"prometheus\"}",
+          "legendFormat": "Prometheus",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "up{job=\"grafana\"}",
+          "legendFormat": "Grafana",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "up{job=\"node-exporter\"}",
+          "legendFormat": "Node Exporter",
+          "refId": "C"
         }
       ],
-      "title": "Business & Security",
+      "title": "🔧 Monitoring Stack Health",
       "type": "stat"
     },
     {
@@ -423,7 +909,7 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Active alerts with details",
+      "description": "Active alerts requiring attention",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -448,7 +934,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Severity"
+              "options": "severity"
             },
             "properties": [
               {
@@ -484,12 +970,12 @@
         ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 10
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 22
       },
-      "id": 6,
+      "id": 9,
       "options": {
         "cellHeight": "sm",
         "footer": {
@@ -515,20 +1001,20 @@
           "refId": "A"
         }
       ],
-      "title": "Active Alerts Details",
+      "title": "🚨 Active Alerts",
       "transformations": [
         {
           "id": "organize",
           "options": {
             "excludeByName": {
               "Time": true,
-              "_name_": true,
+              "__name__": true,
               "job": true,
-              "instance": true
+              "instance": false
             },
             "indexByName": {},
             "renameByName": {
-              "alertname": "Alert Name",
+              "alertname": "Alert",
               "alertstate": "State",
               "severity": "Severity",
               "service": "Service",
@@ -544,279 +1030,7 @@
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
       },
-      "description": "Total number of URLs created",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 10
-              },
-              {
-                "color": "red",
-                "value": 50
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 0,
-        "y": 18
-      },
-      "id": 7,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": ""
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "text": {}
-      },
-      "pluginVersion": "10.2.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "urls_created_total",
-          "refId": "A"
-        }
-      ],
-      "title": "Total URLs Created",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "description": "Total number of redirects performed",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 20
-              },
-              {
-                "color": "red",
-                "value": 100
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 6,
-        "y": 18
-      },
-      "id": 8,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": ""
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "text": {}
-      },
-      "pluginVersion": "10.2.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "redirects_total",
-          "refId": "A"
-        }
-      ],
-      "title": "Total Redirects",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "description": "Current CPU usage percentage",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 60
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 12,
-        "y": 18
-      },
-      "id": 9,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": ""
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "text": {}
-      },
-      "pluginVersion": "10.2.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
-          "refId": "A"
-        }
-      ],
-      "title": "CPU Usage",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "description": "Current memory usage percentage",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 70
-              },
-              {
-                "color": "red",
-                "value": 90
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 18,
-        "y": 18
-      },
-      "id": 10,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": ""
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "text": {}
-      },
-      "pluginVersion": "10.2.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
-          "refId": "A"
-        }
-      ],
-      "title": "Memory Usage",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "description": "Alert firing frequency over time",
+      "description": "Service availability and uptime tracking",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -829,105 +1043,16 @@
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "none",
+            "fillOpacity": 25,
+            "gradientMode": "opacity",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
             },
             "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 26
-      },
-      "id": 11,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "count by (severity) (ALERTS{alertstate=\"firing\"})",
-          "legendFormat": "{{severity}} alerts",
-          "refId": "A"
-        }
-      ],
-      "title": "Alert History by Severity",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "description": "Service availability over time",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 20,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 3,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
@@ -960,21 +1085,24 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 26
+        "w": 24,
+        "x": 0,
+        "y": 28
       },
-      "id": 12,
+      "id": 10,
       "options": {
         "legend": {
-          "calcs": [],
-          "displayMode": "list",
+          "calcs": [
+            "lastNotNull",
+            "mean"
+          ],
+          "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single",
-          "sort": "none"
+          "mode": "multi",
+          "sort": "desc"
         }
       },
       "targets": [
@@ -984,7 +1112,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "expr": "up{job=\"url-shortener\"}",
-          "legendFormat": "URL Shortener",
+          "legendFormat": "URL Shortener (Render)",
           "refId": "A"
         },
         {
@@ -1015,392 +1143,7 @@
           "refId": "D"
         }
       ],
-      "title": "Service Availability",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "description": "Rate of URL creation per minute",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 34
-      },
-      "id": 13,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "rate(urls_created_total[1m]) * 60",
-          "legendFormat": "URLs Created/min",
-          "refId": "A"
-        }
-      ],
-      "title": "URL Creation Rate",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "description": "Rate of redirects per minute",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 34
-      },
-      "id": 14,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "rate(redirects_total[1m]) * 60",
-          "legendFormat": "Redirects/min",
-          "refId": "A"
-        }
-      ],
-      "title": "Redirect Rate",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "description": "Request duration percentiles",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 42
-      },
-      "id": 15,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "histogram_quantile(0.95, rate(request_duration_seconds_bucket[5m]))",
-          "legendFormat": "95th percentile",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "histogram_quantile(0.50, rate(request_duration_seconds_bucket[5m]))",
-          "legendFormat": "50th percentile (median)",
-          "refId": "B"
-        }
-      ],
-      "title": "Request Duration",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "description": "System resource usage over time",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "max": 100,
-          "min": 0,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 42
-      },
-      "id": 16,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
-          "legendFormat": "CPU Usage %",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
-          "legendFormat": "Memory Usage %",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "100 - ((node_filesystem_avail_bytes{mountpoint=\"/\",fstype!=\"rootfs\"} * 100) / node_filesystem_size_bytes{mountpoint=\"/\",fstype!=\"rootfs\"})",
-          "legendFormat": "Disk Usage %",
-          "refId": "C"
-        }
-      ],
-      "title": "System Resources Over Time",
+      "title": "📊 Service Uptime Timeline",
       "type": "timeseries"
     }
   ],
@@ -1411,19 +1154,19 @@
     "url-shortener",
     "monitoring",
     "devops",
-    "alerts"
+    "production"
   ],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-15m",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "URL Shortener - Comprehensive Monitoring Dashboard",
+  "title": "URL Shortener - Production Dashboard",
   "uid": "url-shortener-dashboard",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
