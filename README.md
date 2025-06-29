@@ -68,8 +68,8 @@ This project demonstrates a **hybrid cloud architecture** where a URL shortener 
 
 ### 1. Clone and Setup
 ```bash
-git clone https://github.com/your-username/url-shortener-monitoring.git
-cd url-shortener-monitoring
+git clone https://github.com/eliorabaev/DevopsFinal.git
+cd DevopsFinal
 ```
 
 ### 2. Start Monitoring Stack
