@@ -100,7 +100,7 @@
           "refId": "A"
         }
       ],
-      "title": "🚀 Service Status",
+      "title": "Service Status",
       "type": "stat"
     },
     {
@@ -178,7 +178,7 @@
           "refId": "B"
         }
       ],
-      "title": "📊 Service Usage Overview",
+      "title": "Service Usage Overview",
       "type": "piechart"
     },
     {
@@ -246,7 +246,7 @@
           "refId": "A"
         }
       ],
-      "title": "⚡ Response Time (P95)",
+      "title": "Response Time (P95)",
       "type": "gauge"
     },
     {
@@ -378,7 +378,7 @@
           "refId": "B"
         }
       ],
-      "title": "📈 Real-Time Activity",
+      "title": "Real-Time Activity",
       "type": "timeseries"
     },
     {
@@ -566,7 +566,7 @@
           "refId": "D"
         }
       ],
-      "title": "📋 Key Metrics Summary",
+      "title": "Key Metrics Summary",
       "type": "stat"
     },
     {
@@ -681,7 +681,7 @@
           "refId": "C"
         }
       ],
-      "title": "⚡ Response Time Distribution",
+      "title": "Response Time Distribution",
       "type": "timeseries"
     },
     {
@@ -802,7 +802,7 @@
           "refId": "C"
         }
       ],
-      "title": "💻 System Resources",
+      "title": "System Resources",
       "type": "timeseries"
     },
     {
@@ -901,7 +901,7 @@
           "refId": "C"
         }
       ],
-      "title": "🔧 Monitoring Stack Health",
+      "title": "Monitoring Stack Health",
       "type": "stat"
     },
     {
@@ -1001,7 +1001,7 @@
           "refId": "A"
         }
       ],
-      "title": "🚨 Active Alerts",
+      "title": "Active Alerts",
       "transformations": [
         {
           "id": "organize",
@@ -1143,7 +1143,7 @@
           "refId": "D"
         }
       ],
-      "title": "📊 Service Uptime Timeline",
+      "title": "Service Uptime Timeline",
       "type": "timeseries"
     }
   ],
