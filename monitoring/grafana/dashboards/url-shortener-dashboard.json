@@ -100,87 +100,31 @@
           "refId": "A"
         }
       ],
-      "title": "🚀 Service Status",
+      "title": "Service Status",
       "type": "stat"
     },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "PBFA97CFB590B2093"
-      },
-      "description": "Total URLs created since service start",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "tooltip": false,
-              "vis": false,
-              "legend": false
-            }
-          },
-          "mappings": [],
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 6,
-        "w": 8,
-        "x": 8,
-        "y": 0
-      },
-      "id": 2,
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": ""
-        },
-        "pieType": "pie",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "legend": {
-          "displayMode": "visible",
-          "placement": "bottom",
-          "showLegend": true,
-          "values": []
-        },
-        "displayLabels": [
-          "name",
-          "value"
-        ]
-      },
-      "pluginVersion": "10.2.0",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "urls_created_total",
-          "legendFormat": "URLs Created",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "expr": "redirects_total",
-          "legendFormat": "Redirects Performed",
-          "refId": "B"
-        }
-      ],
-      "title": "📊 Service Usage Overview",
-      "type": "piechart"
-    },
+   {
+  "datasource": null,
+  "description": "Service information and links",
+  "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+  },
+  "gridPos": {
+    "h": 6,
+    "w": 8,
+    "x": 8,
+    "y": 0
+  },
+  "id": 2,
+  "options": {
+    "content": "## URL Shortener Service\n\n---\n\n**Platform**: [Render](https://render.com)  \n\n**Service URL**: [url-shortener-latest-gccb.onrender.com](https://url-shortener-latest-gccb.onrender.com)  \n\n**GitHub**: [View Source Code](https://github.com/eliorabaev/DevopsFinal)\n\n---",
+    "mode": "markdown"
+  },
+  "pluginVersion": "10.2.0",
+  "title": "Service Info",
+  "type": "text"
+},
     {
       "datasource": {
         "type": "prometheus",
@@ -246,7 +190,7 @@
           "refId": "A"
         }
       ],
-      "title": "⚡ Response Time (P95)",
+      "title": "Response Time (P95)",
       "type": "gauge"
     },
     {
@@ -378,7 +322,7 @@
           "refId": "B"
         }
       ],
-      "title": "📈 Real-Time Activity",
+      "title": "Real-Time Activity",
       "type": "timeseries"
     },
     {
@@ -566,7 +510,7 @@
           "refId": "D"
         }
       ],
-      "title": "📋 Key Metrics Summary",
+      "title": "Key Metrics Summary",
       "type": "stat"
     },
     {
@@ -681,7 +625,7 @@
           "refId": "C"
         }
       ],
-      "title": "⚡ Response Time Distribution",
+      "title": "Response Time Distribution",
       "type": "timeseries"
     },
     {
@@ -802,7 +746,7 @@
           "refId": "C"
         }
       ],
-      "title": "💻 System Resources",
+      "title": "System Resources",
       "type": "timeseries"
     },
     {
@@ -901,7 +845,7 @@
           "refId": "C"
         }
       ],
-      "title": "🔧 Monitoring Stack Health",
+      "title": "Monitoring Stack Health",
       "type": "stat"
     },
     {
@@ -1001,7 +945,7 @@
           "refId": "A"
         }
       ],
-      "title": "🚨 Active Alerts",
+      "title": "Active Alerts",
       "transformations": [
         {
           "id": "organize",
@@ -1143,7 +1087,7 @@
           "refId": "D"
         }
       ],
-      "title": "📊 Service Uptime Timeline",
+      "title": "Service Uptime Timeline",
       "type": "timeseries"
     }
   ],
